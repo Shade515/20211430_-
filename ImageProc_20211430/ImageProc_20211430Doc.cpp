@@ -173,7 +173,7 @@ void CImageProc20211430Doc::LoadImageFile(CArchive& ar)
 	char type[16], buf[256];
 	CFile* fp = ar.GetFile();
 	CString fname = fp->GetFilePath();
-	bool isbmp = true;
+	bool isbmp = false;
 
 	
 	 if (strcmp(strchr(fname, '.'), ".ppm") == 0 || strcmp(strchr(fname, '.'), ".PPM") == 0 ||
@@ -215,7 +215,7 @@ void CImageProc20211430Doc::LoadImageFile(CArchive& ar)
 			 BYTE palette[256 * 4];
 			 ar.Read(palette, 256 * 4);
 		 }
-
+		 isbmp = true;
 	}
 
 	else if (strcmp(strchr(fname, '.'), ".raw") == 0 || strcmp(strchr(fname, '.'), ".RAW") == 0)
@@ -283,23 +283,49 @@ void CImageProc20211430Doc::LoadSecondImageFile(CArchive& ar)
 	char type[16], buf[256];
 	CFile* fp = ar.GetFile();
 	CString fname = fp->GetFilePath();
+	bool isbmp = false;
+
 	int imgw, imgh, imgd;
+
 	if (strcmp(strchr(fname, '.'), ".ppm") == 0 || strcmp(strchr(fname, '.'), ".PPM") == 0 ||
 		strcmp(strchr(fname, '.'), ".pgm") == 0 || strcmp(strchr(fname, '.'), ".PGM") == 0)
 	{
 		ar.ReadString(type, 15);
+
 		do {
 			ar.ReadString(buf, 256);
 		} while (buf[0] == '#');
 		sscanf_s(buf, "%d %d", &imgw, &imgh);
+
 		do {
 			ar.ReadString(buf, 256);
 		} while (buf[0] == '#');
 		sscanf_s(buf, "%d", &maxValue);
+
 		if (strcmp(type, "P5") == 0)  imgd = 1;
 		else                            imgd = 3;
 	}
+	else if (strcmp(strchr(fname, '.'), ".bmp") == 0 || strcmp(strchr(fname, '.'), ".BMP") == 0)
+	{
+		//bitmap file header읽기
+		BITMAPFILEHEADER bmfh;
+		ar.Read((LPSTR)&bmfh, sizeof(bmfh));
+		if (bmfh.bfType != (WORD)('B' | ('M' << 8)))  return;
 
+		//bitmap info header 읽기
+		BITMAPINFOHEADER bih;
+		ar.Read((LPSTR)&bih, sizeof(bih));
+		imgw = bih.biWidth;
+		imgh = bih.biHeight;
+		imgd = bih.biBitCount / 8;
+
+		if (imgd == 1)
+		{   // palette 존재
+			BYTE palette[256 * 4];
+			ar.Read(palette, 256 * 4);
+		}
+		isbmp = true;
+	}
 
 
 	else if (strcmp(strchr(fname, '.'), ".raw") == 0 || strcmp(strchr(fname, '.'), ".RAW") == 0)
@@ -325,8 +351,38 @@ void CImageProc20211430Doc::LoadSecondImageFile(CArchive& ar)
 		InputImg2[i] = (unsigned char*)malloc(ImageWidth * depth);
 	}
 	//영상데이터 읽기
-	for (int i = 0; i < ImageHeight; i++)
-		ar.Read(InputImg2[i], ImageWidth * depth);
+	if (!isbmp)
+	{
+		for (int i = 0; i < ImageHeight; i++)
+			ar.Read(InputImg2[i], ImageWidth * depth);
+	}
+	else
+	{
+		// 파일에서 읽어서 저장
+		BYTE nu[4 * 3];
+		int widthfile;
+		widthfile = (ImageWidth * 8 + 32) / 32 * 4;
+		for (int j = 0; j < ImageHeight; j++)
+		{
+			if (depth == 1)
+				ar.Read(InputImg2[ImageHeight - 1 - j], ImageWidth * depth);
+			else
+			{
+				for (int i = 0; i < ImageWidth; i++)
+				{
+					BYTE r, g, b;
+					ar.Read(&b, 1); ar.Read(&g, 1); ar.Read(&r, 1);
+					InputImg2[ImageHeight - 1 - j][3 * i + 0] = r;
+					InputImg2[ImageHeight - 1 - j][3 * i + 1] = g;
+					InputImg2[ImageHeight - 1 - j][3 * i + 2] = b;
+				}
+			}
+			if ((widthfile - ImageWidth) != 0)
+			{
+				ar.Read(nu, (widthfile - ImageWidth) * depth);
+			}
+		}
+	}
 }
 
 

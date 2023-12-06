@@ -73,6 +73,14 @@ public:
 	afx_msg void OnGeometryHolizantialFlip();
 	afx_msg void OnGeometryVerticalFlip();
 	afx_msg void OnGeometryZoominBilinearInterpolation();
+	afx_msg void OnGeometryWarping();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnAviView();
+	bool bAviMode;
+	CString AviFileName;
+	void LoadAviFile(CDC* pDC);
+	afx_msg void OnOpencv();
 };
 
 #ifndef _DEBUG  // ImageProc_20211430View.cpp의 디버그 버전
