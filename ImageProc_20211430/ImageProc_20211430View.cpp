@@ -12,7 +12,6 @@
 
 #include "ImageProc_20211430Doc.h"
 #include "ImageProc_20211430View.h"
-#include "COpenCVDlg.h"
 
 #include <vfw.h>
 
@@ -62,7 +61,6 @@ BEGIN_MESSAGE_MAP(CImageProc20211430View, CScrollView)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_COMMAND(ID_AVI_VIEW, &CImageProc20211430View::OnAviView)
-	ON_COMMAND(ID_OPENCV, &CImageProc20211430View::OnOpencv)
 END_MESSAGE_MAP()
 
 // CImageProc20211430View 생성/소멸
@@ -1692,9 +1690,4 @@ void CImageProc20211430View::LoadAviFile(CDC* pDC)
 }
 
 
-void CImageProc20211430View::OnOpencv()
-{
-	COpenCVDlg dlg;
 
-	dlg.DoModal();
-}

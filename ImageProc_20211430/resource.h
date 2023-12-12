@@ -9,13 +9,9 @@
 #define IDR_MAINFRAME                   128
 #define IDR_ImageProc20211430TYPE       130
 #define ID_WINDOW_MANAGER               131
-#define IDD_DIALOG_OPENCV               313
 #define IDC_MFCBUTTON1                  1001
 #define IDC_EDIT_ANGLE                  1002
 #define IDCANCLE                        1003
-#define IDC_BUTTON_FILE_SELECT          1006
-#define IDC_BUTTON_CAMERA               1007
-#define IDC_BUTTON_VIDEO                1008
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773

@@ -80,7 +80,6 @@ public:
 	bool bAviMode;
 	CString AviFileName;
 	void LoadAviFile(CDC* pDC);
-	afx_msg void OnOpencv();
 };
 
 #ifndef _DEBUG  // ImageProc_20211430View.cpp의 디버그 버전
